@@ -158,7 +158,7 @@
 
 
 
-(comment 
+(comment
 
   (def biblio  (parse-bibliography (->> "samples/literature.bib"
                                         io/resource

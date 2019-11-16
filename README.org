@@ -1,27 +1,33 @@
 * clj-bibtex
 
-FIXME: description
+  A simple wrapper around [`jbibtex`](https://github.com/jbibtex/jbibtex), for
+  handling BibTeX bibliographies.
 
-** Installation
+  `jbibtex` is a nice, robust library, but it is a bit too OO to use with direct
+  interop. `clj-bibtex` provides a way to load a `.bib` file into plain Clojure
+  data structures.
 
-Download from http://example.com/FIXME.
-
+  The idea is to build on top of this some functionality for managing the
+  bibliography ()
 ** Usage
-
-FIXME: explanation
-
-Run the project's tests (they'll fail until you edit them):
-
-    $ clj -A:test:runner
+   For the time being, the API is limited to simply processing a `.bib` file,
+   passed as an absolute path to `parse-bibliography`.
+ 
 
 ** Options
 
-FIXME: listing of options this app accepts.
+   None! Simple, isn't it? 
 
 ** Examples
 
-...
-
+   If you start a REPL in this project, you can test it with  
+```clojure
+(parse-bibliography (->> "samples/literature.bib"
+                       io/resource
+                       io/as-file
+                       (#(.getPath %))))
+```
+ 
 *** Bugs
 
 ...
