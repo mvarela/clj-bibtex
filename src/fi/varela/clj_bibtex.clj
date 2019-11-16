@@ -59,6 +59,7 @@
          :members
          (into {} (make-xform prefix)))))
 
+;; Some utility maps
 (def entry-fields
   (extract-keys :key))
 
@@ -68,6 +69,7 @@
 (def entry-types-reverse
   (reduce-kv (fn[acc k v]
                (assoc acc v k)) {} entry-types))
+
 
 (defmulti normalize-author
   "Attempts to normalize an author's name represented by `name-str`. Bib entries
@@ -111,12 +113,17 @@
                  string/trim)]
     (string/join ", " [last first])))
 
-(defn- split-authors [author-str]
+(defn- split-authors
+  "Splits the `author-str` string representing the author field in a BibTeX entry
+  into normalized author names"
+  [author-str]
   (-> author-str
      (string/split #" and ")
      (->> (mapv (comp string/trim normalize-author)))))
 
-(defn- ->entry [^BibTeXEntry e]
+(defn- ->entry
+  "Converts a `BibTexEntry` object `e` into a map with the relevant fields"
+  [^BibTeXEntry e]
   (let [base (reduce-kv (fn [acc k v]
                           (let [f (get-field e v)]
                             (if (some? f)
@@ -137,7 +144,10 @@
        (some? author-list) (assoc :author author-list))))
 
 
-(defn parse-bibliography [file-name]
+(defn parse-bibliography
+  "Parses a file denoted by `file-name` into a collection of maps
+  representing the BibTeX entries in the file"
+  [file-name]
   (->> file-name
      (java.io.FileReader.)
      ((memfn parse f)  bibtex-parser)
