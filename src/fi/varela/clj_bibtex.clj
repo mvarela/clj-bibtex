@@ -53,7 +53,7 @@
      (map (fn[e]
             [e (string/upper-case (name e))])))))
 
-(defn extract-keys [prefix]
+(defn- extract-keys [prefix]
   (when (#{:key :type} prefix)
     (->> (reflect/reflect BibTeXEntry)
          :members
@@ -69,12 +69,54 @@
   (reduce-kv (fn[acc k v]
                (assoc acc v k)) {} entry-types))
 
-(defn split-authors [author-str]
+(defmulti normalize-author
+  "Attempts to normalize an author's name represented by `name-str`. Bib entries
+  tend to bi a mish-mash of styles when it comes to writing authors names,
+  ending up with things like \"First Last\", \"F. Last\" \"Last, First\", or
+  \"Last, F.\". Things like compound names make this even more
+  complicated (e.g., if correctly formatted in natural order, it could be
+  \"First {Compound Second}\", though the better way to format it would be
+  \"Compound Second, First\"). We start out with the simpler cases, and
+  normalize to a \"Last, First\" format. The approach used is very naïve and
+  bound to fail in some scenarios, but it should be an OK first approximation.
+  We'll use multi-methods and eventually update the dispatch function if we need
+  to cover further cases"
+  (fn
+    [name-str]
+     (cond
+      (and (not (re-find #"[,]" name-str))
+           (not (re-find #"[{]" name-str))) :author-name/natural-non-compound
+      (and (not (re-find #"[,]" name-str))
+           (re-find #"[{]" name-str)) :author-name/natural-compound
+      :else :author-name/last-first)))
+
+(defmethod normalize-author :author-name/last-first
+  [name-str]
+  name-str)
+
+(defmethod normalize-author :author-name/natural-non-compound
+  [name-str]
+  (let [parts (string/split name-str #"\p{Blank}")
+        first (pop parts)
+        last (peek parts)]
+    (string/join ", " [last (string/join " " first)])))
+
+(defmethod normalize-author :author-name/natural-compound
+  [name-str]
+  (let [regex  #"\{.*\}"
+        last (-> (re-find regex name-str)
+                (string/replace #"[\{\}]" ""))
+        first (->> (string/split name-str regex)
+                 first
+                 string/trim)]
+    (string/join ", " [last first])))
+
+(defn- split-authors [author-str]
   (-> author-str
      (string/split #" and ")
-     (->> (mapv string/trim))))
+     (->> (mapv (comp string/trim normalize-author)))))
 
-(defn ->entry [^BibTeXEntry e]
+(defn- ->entry [^BibTeXEntry e]
   (let [base (reduce-kv (fn [acc k v]
                           (let [f (get-field e v)]
                             (if (some? f)
@@ -107,10 +149,11 @@
 
 
 (comment 
-  (def fname  "/home/mvr/Devel/Clojure/fi.varela.bibtex/resources/samples/literature.bib")
-  (def biblio  (parse-bibliography fname))
+
+  (def biblio  (parse-bibliography (->> "samples/literature.bib"
+                                        io/resource
+                                        io/as-file
+                                        (#(.getPath %)))))
 
   biblio
-
-
   )
