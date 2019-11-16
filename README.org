@@ -1,17 +1,17 @@
 * clj-bibtex
 
-  A simple wrapper around [`jbibtex`](https://github.com/jbibtex/jbibtex), for
+  A simple wrapper around [[https://github.com/jbibtex/jbibtex][jbibtex]], for
   handling BibTeX bibliographies.
 
-  `jbibtex` is a nice, robust library, but it is a bit too OO to use with direct
-  interop. `clj-bibtex` provides a way to load a `.bib` file into plain Clojure
+  =jbibtex= is a nice, robust library, but it is a bit too OO to use with direct
+  interop. =clj-bibtex= provides a way to load a =.bib= file into plain Clojure
   data structures.
 
   The idea is to build on top of this some functionality for managing the
   bibliography ()
 ** Usage
-   For the time being, the API is limited to simply processing a `.bib` file,
-   passed as an absolute path to `parse-bibliography`.
+   For the time being, the API is limited to simply processing a =.bib= file,
+   passed as an absolute path to =parse-bibliography=.
  
 
 ** Options
@@ -21,13 +21,12 @@
 ** Examples
 
    If you start a REPL in this project, you can test it with  
-```clojure
+#+begin_src clojure :exports code
 (parse-bibliography (->> "samples/literature.bib"
                        io/resource
                        io/as-file
                        (#(.getPath %))))
-```
- 
+#+end_src 
 *** Bugs
 
 ...
