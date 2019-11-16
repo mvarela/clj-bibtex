@@ -4,8 +4,7 @@
   (:require [clojure.java.io :as io]
             [clojure.pprint :as pprint]
             [clojure.reflect :as reflect]
-            [clojure.string :as string]
-            [fipp.clojure :as fipp]))
+            [clojure.string :as string]))
 
 ;;; This namespace provides an idiomatic wrapper for the parsing functionality
 ;;; of [jbibtex](https://github.com/jbibtex/jbibtex), which while providing great

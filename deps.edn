@@ -1,7 +1,6 @@
 {:paths ["resources" "src"]
  :deps {org.clojure/clojure {:mvn/version "RELEASE"}
-        org.jbibtex/jbibtex {:mvn/version "1.0.17"}
-        fipp {:mvn/version "0.6.21"}}
+        org.jbibtex/jbibtex {:mvn/version "1.0.17"}}
  :aliases
  {:test {:extra-paths ["test"]
          :extra-deps {org.clojure/test.check {:mvn/version "RELEASE"}}}
