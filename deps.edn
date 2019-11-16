@@ -1,6 +1,7 @@
 {:paths ["resources" "src"]
  :deps {org.clojure/clojure {:mvn/version "RELEASE"}
-        org.jbibtex/jbibtex {:mvn/version "1.0.17"}}
+        org.jbibtex/jbibtex {:mvn/version "1.0.17"}
+        datascript/datascript {:mvn/version "0.18.7"}}
  :aliases
  {:test {:extra-paths ["test"]
          :extra-deps {org.clojure/test.check {:mvn/version "RELEASE"}}}

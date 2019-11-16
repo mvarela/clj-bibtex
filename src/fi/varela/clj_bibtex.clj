@@ -120,6 +120,13 @@
      (string/split #" and ")
      (->> (mapv (comp string/trim normalize-author)))))
 
+(defn- process-names
+  [base a-key]
+  (when (some? (a-key base))
+    (let [ns-key (keyword (name a-key) "name")
+          a-list (split-authors (a-key base))]
+      (mapv (fn[name]{ns-key name}) a-list))))
+
 (defn- ->entry
   "Converts a `BibTexEntry` object `e` into a map with the relevant fields"
   [^BibTeXEntry e]
@@ -135,12 +142,13 @@
                 (when (some? y)
                   (try (Integer/parseInt y)
                        (catch Exception e y))))
-        author-list (when (some? (:author base))
-                      (split-authors (:author base)))]
+        author-list (process-names base :author)
+        editor-list (process-names base :editor)]
     (cond-> base
        true (assoc :type type)
        (some? year) (assoc  :year year)
-       (some? author-list) (assoc :author author-list))))
+       (some? author-list) (assoc :author author-list)
+       (some? editor-list) (assoc :editor editor-list))))
 
 
 (defn parse-bibliography
