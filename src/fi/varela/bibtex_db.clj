@@ -44,4 +44,9 @@
         [?a :author/name ?n]
         [(re-find #"Varela" ?n)]]
       @conn)
+ (d/q '[:find ?e ?n
+        :where
+        [?e :author/name ?n]
+        [(re-find #"Tobias" ?n)]] @conn)
+
  )

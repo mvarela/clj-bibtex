@@ -117,7 +117,7 @@
   into normalized author names"
   [author-str]
   (-> author-str
-     (string/split #" and ")
+     (string/split #"\p{Space}and\p{Space}")
      (->> (mapv (comp string/trim normalize-author)))))
 
 (defn- process-names
