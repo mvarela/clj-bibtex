@@ -10,9 +10,8 @@
   The idea is to build on top of this some functionality for managing the
   bibliography ()
 ** Usage
-   For the time being, the API is limited to simply processing a =.bib= file,
-   passed as an absolute path to =parse-bibliography=.
- 
+   For the time being, the API is rather limited. It has functionality to parse
+   and serialize bibliographies (in =fi.varela.clj-bibtex=
 
 ** Options
 
@@ -22,111 +21,113 @@
 
    If you start a REPL in this project, you can test it with  
 #+begin_src clojure :exports code
-(in-ns user)
-(require '[fi.varela.clj-bibtex :as b]
-         '[fi.varela.bibtex-db :as d]
-         '[clojure.java.io :as io]
-         '[clojure.string :as string])
+  (in-ns 'user)
 
-(def biblio  (b/parse-bibliography (->> "samples/literature.bib"
-                                    io/resource
-                                    io/as-file
-                                    (#(.getPath %)))))
+  (require '[fi.varela.clj-bibtex.core :as b]
+           '[fi.varela.clj-bibtex.db :as d]
+           '[clojure.java.io :as io]
+           '[clojure.string :as string])
 
-(def conn (d/make-conn))
+  (def biblio  (b/parse-bibliography (->> "samples/literature.bib"
+                                      io/resource
+                                      io/as-file
+                                      (#(.getPath %)))))
 
-(d/ingest-bibliography! conn biblio)
-;; => ["Cannot add #datascript/Datom [559 :publication/title \"A machine learning approach to classifying YouTube QoE based on encrypted network traffic\" 536871073 true] because of unique constraint: (#datascript/Datom [407 :publication/title \"A machine learning approach to classifying YouTube QoE based on encrypted network traffic\" 536871023 true])" "Cannot add #datascript/Datom [607 :publication/title \"SDNDASH: Improving QoE of HTTP Adaptive Streaming Using Software Defined Networking\" 536871088 true] because of unique constraint: (#datascript/Datom [152 :publication/title \"SDNDASH: Improving QoE of HTTP Adaptive Streaming Using Software Defined Networking\" 536870953 true])" "Cannot add #datascript/Datom [651 :publication/title \"Understanding the impact of video quality on user engagement\" 536871105 true] because of unique constraint: (#datascript/Datom [431 :publication/title \"Understanding the impact of video quality on user engagement\" 536871034 true])" "Cannot add #datascript/Datom [713 :publication/title \"QoE-centric service delivery: A collaborative approach among OTTs and ISPs\" 536871124 true] because of unique constraint: (#datascript/Datom [316 :publication/title \"QoE-centric service delivery: A collaborative approach among OTTs and ISPs\" 536870994 true])"]
+  (def conn (d/make-conn))
 
-(d/fuzzy-by-author @conn "atzor")
-;; => [{:publication/publisher "Elsevier",
-;;   :publication/volume "110",
-;;   :publication/pages "168–179",
-;;   :publication/author
-;;   [#:author{:name "Ahmad, Arslan"}
-;;    #:author{:name "Floris, Alessandro"}
-;;    #:author{:name "Atzori, Luigi"}],
-;;   :publication/type :article,
-;;   :publication/journal "Computer Networks",
-;;   :publication/title
-;;   "QoE-centric service delivery: A collaborative approach among OTTs and ISPs",
-;;   :db/id 316,
-;;   :publication/key "ahmad2016qoe",
-;;   :publication/year 2016}
-;;  {:publication/pages "1–6",
-;;   :publication/booktitle
-;;   "Quality of Multimedia Experience (QoMEX), 2016 Eighth International Conference on",
-;;   :publication/author
-;;   [#:author{:name "Ahmad, Arslan"}
-;;    #:author{:name "Floris, Alessandro"}
-;;    #:author{:name "Atzori, Luigi"}],
-;;   :publication/type :inproceedings,
-;;   :publication/organization "IEEE",
-;;   :publication/title
-;;   "QoE-aware service delivery: a joint-venture approach for content and network providers",
-;;   :db/id 360,
-;;   :publication/key "ahmad2016qoeQOMEX16",
-;;   :publication/year 2016}
-;;    ...
+  (d/ingest-bibliography! conn biblio)
+  ;; => ["Cannot add #datascript/Datom [559 :publication/title \"A machine learning approach to classifying YouTube QoE based on encrypted network traffic\" 536871073 true] because of unique constraint: (#datascript/Datom [407 :publication/title \"A machine learning approach to classifying YouTube QoE based on encrypted network traffic\" 536871023 true])" "Cannot add #datascript/Datom [607 :publication/title \"SDNDASH: Improving QoE of HTTP Adaptive Streaming Using Software Defined Networking\" 536871088 true] because of unique constraint: (#datascript/Datom [152 :publication/title \"SDNDASH: Improving QoE of HTTP Adaptive Streaming Using Software Defined Networking\" 536870953 true])" "Cannot add #datascript/Datom [651 :publication/title \"Understanding the impact of video quality on user engagement\" 536871105 true] because of unique constraint: (#datascript/Datom [431 :publication/title \"Understanding the impact of video quality on user engagement\" 536871034 true])" "Cannot add #datascript/Datom [713 :publication/title \"QoE-centric service delivery: A collaborative approach among OTTs and ISPs\" 536871124 true] because of unique constraint: (#datascript/Datom [316 :publication/title \"QoE-centric service delivery: A collaborative approach among OTTs and ISPs\" 536870994 true])"]
+  ;; Duplicate entries are not added to the DB, currently
 
-(d/fuzzy-by-title @conn "level ag")
-;; => [{:publication/pages "1741–1746",
-;;      :publication/booktitle
-;;      "2015 IEEE International Conference on Communication Workshop (ICCW)",
-;;      :publication/author
-;;      [#:author{:name "Varela, Martn"}
-;;       #:author{:name "Zwickl, Patrick"}
-;;       #:author{:name "Schulzrinne, Henning"}
-;;       #:author{:name "Reichl, Peter"}
-;;       #:author{:name "Xie, Min"}],
-;;      :publication/type :inproceedings,
-;;      :publication/organization "IEEE",
-;;      :publication/title
-;;      "From Service Level Agreements (SLA) to Experience Level Agreements (ELA): The Challenges of Selling QoE to the User",
-;;      :db/id 651,
-;;      :publication/key "varela2015service",
-;;      :publication/year 2015}]
+  (d/fuzzy-by-author @conn "atzor")
+  ;; => [{:publication/publisher "Elsevier",
+  ;;   :publication/volume "110",
+  ;;   :publication/pages "168–179",
+  ;;   :publication/author
+  ;;   [#:author{:name "Ahmad, Arslan"}
+  ;;    #:author{:name "Floris, Alessandro"}
+  ;;    #:author{:name "Atzori, Luigi"}],
+  ;;   :publication/type :article,
+  ;;   :publication/journal "Computer Networks",
+  ;;   :publication/title
+  ;;   "QoE-centric service delivery: A collaborative approach among OTTs and ISPs",
+  ;;   :db/id 316,
+  ;;   :publication/key "ahmad2016qoe",
+  ;;   :publication/year 2016}
+  ;;  {:publication/pages "1–6",
+  ;;   :publication/booktitle
+  ;;   "Quality of Multimedia Experience (QoMEX), 2016 Eighth International Conference on",
+  ;;   :publication/author
+  ;;   [#:author{:name "Ahmad, Arslan"}
+  ;;    #:author{:name "Floris, Alessandro"}
+  ;;    #:author{:name "Atzori, Luigi"}],
+  ;;   :publication/type :inproceedings,
+  ;;   :publication/organization "IEEE",
+  ;;   :publication/title
+  ;;   "QoE-aware service delivery: a joint-venture approach for content and network providers",
+  ;;   :db/id 360,
+  ;;   :publication/key "ahmad2016qoeQOMEX16",
+  ;;   :publication/year 2016}
+  ;;    ...
 
-(doseq [entry (map b/->bib  (d/fuzzy-by-title @conn "management"))]
-  (println entry))
-;; =>
-;; @inproceedings{bertozzi2002power,
-;; 	volume: {2},
-;; 	pages: {926–930},
-;; 	booktitle: {Wireless Communications and Networking Conference, 2002. WCNC2002. 2002 IEEE},
-;; 	author: {Bertozzi, Davide and Benini, Luca and Ricco, Bruno},
-;; 	organization: {IEEE},
-;; 	title: {{Power aware network interface management for streaming multimedia}},
-;; 	year: {2002},
-;; }
-;; @article{wang2017data,
-;; 	publisher: {IEEE},
-;; 	volume: {24},
-;; 	pages: {102–110},
-;; 	author: {Wang, Ying and Li, Peilong and Jiao, Lei and Su, Zhou and Cheng, Nan and Shen, Xuemin Sherman and Zhang, Ping},
-;; 	journal: {IEEE Wireless Communications},
-;; 	title: {{A data-driven architecture for personalized QoE management in 5G wireless networks}},
-;; 	number: {1},
-;; 	year: {2017},
-;; }
-;; @inproceedings{hossfeld2017betas,
-;; 	pages: {1011–1016},
-;; 	booktitle: {Integrated Network and Service Management (IM), 2017 IFIP/IEEE Symposium on},
-;; 	author: {Hoßfeld, Tobias and Fiedler, Markus and Gustafsson, Jörgen},
-;; 	organization: {IEEE},
-;; 	title: {{Betas: Deriving quantiles from mos-qos relations of iqx models for qoe management}},
-;; 	year: {2017},
-;; }
-;; @inproceedings{awobuluyi:video-quality,
-;; 	pages: {1657-1662},
-;; 	booktitle: {2015 IEEE International Conference on Computer and Information Technology; Ubiquitous Computing and Communications; Dependable, Autonomic and Secure Computing; Pervasive Intelligence and Computing},
-;; 	author: {Awobuluyi, O. and Nightingale, J. and Wang, Q. and Alcaraz-Calero, J. M.},
-;; 	title: {{Video Quality in 5G Networks: Context-Aware QoE Management in the SDN Control Plane}},
-;; 	doi: {10.1109/CIT/IUCC/DASC/PICOM.2015.250},
-;; 	year: {2015},
-;; 	month: {Oct},
-;; }
-;; ...
+  (d/fuzzy-by-title @conn "level ag")
+  ;; => [{:publication/pages "1741–1746",
+  ;;      :publication/booktitle
+  ;;      "2015 IEEE International Conference on Communication Workshop (ICCW)",
+  ;;      :publication/author
+  ;;      [#:author{:name "Varela, Martn"}
+  ;;       #:author{:name "Zwickl, Patrick"}
+  ;;       #:author{:name "Schulzrinne, Henning"}
+  ;;       #:author{:name "Reichl, Peter"}
+  ;;       #:author{:name "Xie, Min"}],
+  ;;      :publication/type :inproceedings,
+  ;;      :publication/organization "IEEE",
+  ;;      :publication/title
+  ;;      "From Service Level Agreements (SLA) to Experience Level Agreements (ELA): The Challenges of Selling QoE to the User",
+  ;;      :db/id 651,
+  ;;      :publication/key "varela2015service",
+  ;;      :publication/year 2015}]
+
+  (doseq [entry (map b/->bib  (d/fuzzy-by-title @conn "management"))]
+    (println entry))
+  ;; =>
+  ;; @inproceedings{bertozzi2002power,
+  ;; 	volume: {2},
+  ;; 	pages: {926–930},
+  ;; 	booktitle: {Wireless Communications and Networking Conference, 2002. WCNC2002. 2002 IEEE},
+  ;; 	author: {Bertozzi, Davide and Benini, Luca and Ricco, Bruno},
+  ;; 	organization: {IEEE},
+  ;; 	title: {{Power aware network interface management for streaming multimedia}},
+  ;; 	year: {2002},
+  ;; }
+  ;; @article{wang2017data,
+  ;; 	publisher: {IEEE},
+  ;; 	volume: {24},
+  ;; 	pages: {102–110},
+  ;; 	author: {Wang, Ying and Li, Peilong and Jiao, Lei and Su, Zhou and Cheng, Nan and Shen, Xuemin Sherman and Zhang, Ping},
+  ;; 	journal: {IEEE Wireless Communications},
+  ;; 	title: {{A data-driven architecture for personalized QoE management in 5G wireless networks}},
+  ;; 	number: {1},
+  ;; 	year: {2017},
+  ;; }
+  ;; @inproceedings{hossfeld2017betas,
+  ;; 	pages: {1011–1016},
+  ;; 	booktitle: {Integrated Network and Service Management (IM), 2017 IFIP/IEEE Symposium on},
+  ;; 	author: {Hoßfeld, Tobias and Fiedler, Markus and Gustafsson, Jörgen},
+  ;; 	organization: {IEEE},
+  ;; 	title: {{Betas: Deriving quantiles from mos-qos relations of iqx models for qoe management}},
+  ;; 	year: {2017},
+  ;; }
+  ;; @inproceedings{awobuluyi:video-quality,
+  ;; 	pages: {1657-1662},
+  ;; 	booktitle: {2015 IEEE International Conference on Computer and Information Technology; Ubiquitous Computing and Communications; Dependable, Autonomic and Secure Computing; Pervasive Intelligence and Computing},
+  ;; 	author: {Awobuluyi, O. and Nightingale, J. and Wang, Q. and Alcaraz-Calero, J. M.},
+  ;; 	title: {{Video Quality in 5G Networks: Context-Aware QoE Management in the SDN Control Plane}},
+  ;; 	doi: {10.1109/CIT/IUCC/DASC/PICOM.2015.250},
+  ;; 	year: {2015},
+  ;; 	month: {Oct},
+  ;; }
+  ;; ...
 #+end_src 
 *** Bugs
 

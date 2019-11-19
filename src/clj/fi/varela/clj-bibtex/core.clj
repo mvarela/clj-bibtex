@@ -1,4 +1,4 @@
-(ns fi.varela.clj-bibtex
+(ns fi.varela.clj-bibtex.core
   "Clojure wrapper for parsing BibTex data using jbibtex"
   (:import [org.jbibtex BibTeXParser BibTeXDatabase BibTeXEntry BibTeXObject BibTeXFormatter Key StringValue LaTeXParser LaTeXPrinter])
   (:require [clojure.java.io :as io]

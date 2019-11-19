@@ -1,4 +1,4 @@
-(ns fi.varela.bibtex-db
+(ns fi.varela.clj-bibtex.db
   (:require [datascript.core :as d]
             [clojure.string :as string]))
 
@@ -90,7 +90,7 @@
 
   (def conn (make-conn) )
 
-  (ingest-bibliography! conn fi.varela.clj-bibtex/biblio)
+  (ingest-bibliography! conn fi.varela.clj-bibtex.core/biblio)
 
   (all-authors @conn)
 
