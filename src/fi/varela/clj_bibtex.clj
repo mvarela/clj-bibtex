@@ -198,21 +198,7 @@
 
   biblio
   (def t1 (second (first biblio)))
-  (second t1)
-  t1
-
   (println  (->bib t1))
-d
-  (-> t1
-     (dissoc :publication/key :publication/type :db/id)
-     (reduce-kv (fn[a k v]
-                  (str a (field->bib [k v])))))
-
-
-  (let [#:publication{:keys [key type]} t1]
-    key)
-
-
   )
 
 
