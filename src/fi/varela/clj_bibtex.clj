@@ -77,48 +77,47 @@
   \"Last, F.\". Things like compound names make this even more
   complicated (e.g., if correctly formatted in natural order, it could be
   \"First {Compound Second}\", though the better way to format it would be
-  \"Compound Second, First\"). We start out with the simpler cases, and
-  normalize to a \"Last, First\" format. The approach used is very naïve and
-  bound to fail in some scenarios, but it should be an OK first approximation.
-  We'll use multi-methods and eventually update the dispatch function if we need
-  to cover further cases"
+  \"Compound Second, First\"). Since we are processing the LaTeX strings before getting
+  to this stage, at the moment we won't handle the \"First {Compound Second}\" case." 
   (fn
     [name-str]
      (cond
-      (and (not (re-find #"[,]" name-str))
-           (not (re-find #"[{]" name-str))) :author-name/natural-non-compound
-      (and (not (re-find #"[,]" name-str))
-           (re-find #"[{]" name-str)) :author-name/natural-compound
-      :else :author-name/last-first)))
+        (re-find #"[,]" name-str) :author-name/last-first
+      :else :author-name/first-last)))
 
 (defmethod normalize-author :author-name/last-first
   [name-str]
   name-str)
 
-(defmethod normalize-author :author-name/natural-non-compound
+(defmethod normalize-author :author-name/first-last
   [name-str]
   (let [parts (string/split name-str #"\p{Blank}")
         first (pop parts)
         last (peek parts)]
     (string/join ", " [last (string/join " " first)])))
 
-(defmethod normalize-author :author-name/natural-compound
-  [name-str]
-  (let [regex  #"\{.*\}"
-        last (-> (re-find regex name-str)
-                (string/replace #"[\{\}]" ""))
-        first (->> (string/split name-str regex)
-                 first
-                 string/trim)]
-    (string/join ", " [last first])))
-
 (defn- split-authors
   "Splits the `author-str` string representing the author field in a BibTeX entry
   into normalized author names"
   [author-str]
   (-> author-str
-     (string/split #" and ")
+     (string/split #"\p{Space}and\p{Space}")
      (->> (mapv (comp string/trim normalize-author)))))
+
+(defn- process-names
+  [base a-key]
+  (when (some? (a-key base))
+    (let [ns-key (keyword (name a-key) "name")
+          a-list (split-authors (a-key base))]
+      (mapv (fn[name]{ns-key name}) a-list))))
+
+(defn- add-namespace
+  "Given a keyword-keyed map `m`, with non-namespaced keys, prefix its keys
+  with the namespace `ns`"
+  [m ns]
+  (reduce-kv (fn[acc k v]
+               (assoc acc (keyword ns (name k)) v))
+             {} m))
 
 (defn- ->entry
   "Converts a `BibTexEntry` object `e` into a map with the relevant fields"
@@ -135,12 +134,15 @@
                 (when (some? y)
                   (try (Integer/parseInt y)
                        (catch Exception e y))))
-        author-list (when (some? (:author base))
-                      (split-authors (:author base)))]
+        author-list (process-names base :author)
+        editor-list (process-names base :editor)]
     (cond-> base
        true (assoc :type type)
        (some? year) (assoc  :year year)
-       (some? author-list) (assoc :author author-list))))
+       (some? author-list) (assoc :author author-list)
+       (some? editor-list) (assoc :editor editor-list)
+       true (add-namespace "publication"))))
+
 
 
 (defn parse-bibliography
@@ -152,10 +154,40 @@
      ((memfn parse f)  bibtex-parser)
      ((memfn getEntries))
      (map (fn [kv]
-            [(.toString(.getKey kv)) (->entry (.getValue kv))]))
+            (let [entry-key (.toString(.getKey kv))]
+              [entry-key (-> (->entry (.getValue kv))
+                            (assoc :publication/key entry-key))])))
      (into {})))
 
+(defn- names->bib
+  [k a]
+  (let [authors-str (flatten (mapv vals a))]
+    (str "\t" k ": {" (string/join " and " authors-str)  "},\n")))
 
+(defmulti field->bib (fn[[k v]]
+                      k))
+
+
+(defmethod field->bib :publication/author [[_ a]]
+  (names->bib "author" a))
+
+(defmethod field->bib :publication/editor [[_ a]]
+  (names->bib "editor" a))
+
+(defmethod field->bib :publication/title [[k v]]
+  (str "\t" (name k) ": {{" v "}},\n"))
+
+(defmethod field->bib :default [[k v]]
+  (str "\t" (name k) ": {" v "},\n"))
+
+
+(defn ->bib [entry]
+  (let [#:publication{:keys [key type]} entry
+        fields (-> entry
+                  (dissoc :publication/key :publication/type :db/id)
+                  (->>
+                   (reduce (fn[a kv] (conj a (field->bib kv))) [])))]
+    (str "@" (name type) "{" key ",\n" (string/join fields) "}")))
 
 (comment
 
@@ -165,4 +197,9 @@
                                         (#(.getPath %)))))
 
   biblio
+  (def t1 (second (first biblio)))
+  (println  (->bib t1))
   )
+
+
+
