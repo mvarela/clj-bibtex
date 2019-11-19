@@ -1,5 +1,6 @@
 (ns fi.varela.bibtex-db
-  (:require [datascript.core :as d]))
+  (:require [datascript.core :as d]
+            [clojure.string :as string]))
 
 (defn make-conn
   "Creates a connection to an empty db with a suitable schema for BibTeX entries"
@@ -52,11 +53,19 @@
          :where
          [?e :publication/key]] db))
 
+
+(defn- build-regex [pattern]
+  (let [words (string/split pattern #"\p{Space}")
+        p (string/join "\\p{Space}" (map (fn[s]
+                                          (str "(?xi)" s))
+                                        words))]
+    (re-pattern p)))
+
 (defn fuzzy-by-title
   "Returns a vector of entries in `db` whose title matches (case-insensitive)
   `pattern`. Pattern is treated as a regex string"
   [db pattern]
-  (let [regex (re-pattern (str "(?xi)" pattern))]
+  (let [regex (build-regex pattern)]
     (d/q '[:find [(pull ?e [* {:publication/author [:author/name]
                                :publication/editor [:editor/name]}]) ...]
            :in $ ?p
