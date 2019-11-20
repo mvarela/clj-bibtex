@@ -7,4 +7,21 @@
          :extra-deps {juxt/iota {:mvn/version "0.2.3"}
                       lambdaisland/kaocha {:mvn/version "0.0-554"}
                       lambdaisland/kaocha-cloverage {:mvn/version "0.0-41"}
-                      org.clojure/test.check {:mvn/version "RELEASE"}}}}}
+                      org.clojure/test.check {:mvn/version "RELEASE"}}}
+  :cambada
+  {:extra-deps
+   {luchiniatwork/cambada
+    {:mvn/version "1.0.2"}}}
+  :uberjar {:extra-deps
+            {luchiniatwork/cambada {:mvn/version "1.0.2"}}
+            :main-opts ["-m" "cambada.uberjar"
+                        "--app-version" "0.1.0-SNAPSHOT"
+                        "--app-group-id" "fi.varela"
+                        "--app-artifact-id" "clj-bibtex"]}
+  :jar {:extra-deps
+        {luchiniatwork/cambada {:mvn/version "1.0.2"}}
+        :main-opts ["-m" "cambada.jar"
+                    "--app-version" "0.1.0-SNAPSHOT"
+                    "--app-group-id" "fi.varela"
+                    "--app-artifact-id" "clj-bibtex"]}}}
+
