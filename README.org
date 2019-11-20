@@ -5,13 +5,15 @@
 
   =jbibtex= is a nice, robust library, but it is a bit too OO to use with direct
   interop. =clj-bibtex= provides a way to load a =.bib= file into plain Clojure
-  data structures.
+  data structures, and optionally into a Datascript database, allowing fuzzy
+  searches and de-duplication of entries.
 
   The idea is to build on top of this some functionality for managing the
   bibliography ()
 ** Usage
    For the time being, the API is rather limited. It has functionality to parse
-   and serialize bibliographies (in =fi.varela.clj-bibtex=
+   and serialize bibliographies (in =fi.varela.clj-bibtex.core=), and to feed
+   them into a Datascript DB (in =fi.varela.clj-bibtex.db=).
 
 ** Options
 
