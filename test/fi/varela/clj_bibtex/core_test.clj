@@ -26,8 +26,3 @@
   (is (= "Last, First" (sut/normalize-author "Last, First")))
   (is (= "Mononym" (sut/normalize-author "Mononym")))
   (is (= "Last, First" (sut/normalize-author "First Last"))))
-
-
-(clojure.string/split "TOTO," #",")
-(pop 
- ["toto"])
