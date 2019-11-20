@@ -78,7 +78,7 @@
   complicated (e.g., if correctly formatted in natural order, it could be
   \"First {Compound Second}\", though the better way to format it would be
   \"Compound Second, First\"). Since we are processing the LaTeX strings before getting
-  to this stage, at the moment we won't handle the \"First {Compound Second}\" case." 
+  to this stage, at the moment we won't handle the \"First {Compound Second}\" case."
   (fn
     [name-str]
      (cond
@@ -94,7 +94,9 @@
   (let [parts (string/split name-str #"\p{Blank}")
         first (pop parts)
         last (peek parts)]
-    (string/join ", " [last (string/join " " first)])))
+    (if (< 1 (count parts))
+      (string/join ", " [last (string/join " " first)])
+      (or last "AUTHOR MISSING"))))
 
 (defn- split-authors
   "Splits the `author-str` string representing the author field in a BibTeX entry
@@ -200,6 +202,3 @@
   (def t1 (second (first biblio)))
   (println  (->bib t1))
   )
-
-
-
