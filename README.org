@@ -1,8 +1,8 @@
 * clj-bibtex
 [[https://circleci.com/gh/mvarela/clj-bibtex.svg?style=svg]]
+[[https://img.shields.io/clojars/v/fi.varela/clj-bibtex.svg]]
 
-
-  A simple wrapper around [[https://github.com/jbibtex/jbibtex][jbibtex]], for handling BibTeX bibliographies.
+  A simple wrapper around [[https://github.com/jbibtex/jbibtex][jbibtex]] for handling BibTeX bibliographies..
 
   =jbibtex= is a nice, robust library, but it is a bit too OO to use with direct
   interop. =clj-bibtex= provides a way to load a =.bib= file into plain Clojure
@@ -12,10 +12,14 @@
   The idea is to build on top of this some functionality for managing the
   bibliography ()
 ** Usage
-   For the time being, the API is rather limited. It has functionality to parse
-   and serialize bibliographies (in =fi.varela.clj-bibtex.core=), and to feed
-   them into a Datascript DB (in =fi.varela.clj-bibtex.db=).
+   The API is quite basic. It has functionality to parse and serialize
+   bibliographies (in =fi.varela.clj-bibtex.core=), and to feed them into a
+   Datascript DB (in =fi.varela.clj-bibtex.db=), from where we can also do
+   queries, and re-build (normalized) BibTeX output.
 
+   The DB API supports fuzzy searches, and finding similar author names or paper
+   titles, which sometimes can sneak into a .bib file used in several papers.
+   
 ** Options
 
    None! Simple, isn't it? 
@@ -131,6 +135,35 @@
   ;; 	month: {Oct},
   ;; }
   ;; ...
+
+
+  (similar-titles @conn)
+  ;;=>
+  ;;[["Adaptive psychometric scaling for video quality assessment"
+  ;;"Adaptive testing for video quality assessment"
+  ;;0.8085106382978723]
+  ;;["OTT-ISP Joint Service Management: A Customer Lifetime Value Based Approach"
+  ;;"OTT-ISP Joint service management: a customer lifetime value based approach"
+  ;;0.7786259541984732]
+  ;;["OTT-ISP Joint service management: a customer lifetime value based approach"
+  ;;"OTT-ISP joint service management: a Customer Lifetime Value based approach "
+  ;;0.8702290076335878]
+  ;;["Understanding the impact of network dynamics on mobile video user engagement"
+  ;;"Understanding the impact of video quality on user engagement"
+  ;;0.743801652892562]]
+
+  (similar-authors @conn :fuzz-level 0.9)
+  ;;=>
+  ;;[["Heegaard, Poul" "Heegaard, Poul E" 0.9285714285714286]
+  ;;["Heegaard, Poul E" "Heegaard, Poul E." 0.967741935483871]
+  ;;["Kara, Peter A" "Kara, Peter A." 0.96]
+  ;;["Liu, Xi" "Liu, Xin" 0.9230769230769231]
+  ;;["Martini, Maria G" "Martini, Maria G." 0.9629629629629629]
+  ;;["Schatz, Raimund" "Schatz, Raimund." 0.9655172413793104]
+  ;;["Skorin-Kapov, L." "Skorin-Kapov, Lea" 0.9032258064516129]
+  ;;["Yang, Zhe" "Yang, Zhen" 0.9411764705882353]]
+
+
 #+end_src 
 *** Bugs
 

@@ -23,5 +23,8 @@
         :main-opts ["-m" "cambada.jar"
                     "--app-version" "0.1.0"
                     "--app-group-id" "fi.varela"
-                    "--app-artifact-id" "clj-bibtex"]}}}
+                    "--app-artifact-id" "clj-bibtex"]}
+  :deploy {:extra-deps {deps-deploy {:mvn/version "RELEASE"}}
+           :main-opts ["-m" "deps-deploy.deps-deploy" "deploy"
+		                   "target/clj-bibtex-0.1.0.jar"]}}}
 
