@@ -2,8 +2,7 @@
 [[https://circleci.com/gh/mvarela/clj-bibtex.svg?style=svg]]
 
 
-  A simple wrapper around [[https://github.com/jbibtex/jbibtex][jbibtex]], for
-  handling BibTeX bibliographies.
+  A simple wrapper around [[https://github.com/jbibtex/jbibtex][jbibtex]], for handling BibTeX bibliographies.
 
   =jbibtex= is a nice, robust library, but it is a bit too OO to use with direct
   interop. =clj-bibtex= provides a way to load a =.bib= file into plain Clojure
