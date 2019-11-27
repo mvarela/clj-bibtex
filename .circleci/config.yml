@@ -23,7 +23,8 @@ jobs:
         
       - run: ./bin/cibuild
 
-
+      - run: ./bin/coverage
+        
       - codecov/upload:
           file: target/coverage/codecov.json
 
