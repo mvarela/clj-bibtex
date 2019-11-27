@@ -52,3 +52,11 @@
 (deftest fuzzy-author
   (testing "Fuzzy author search"
     (is (= tobias-papers (count (sut/fuzzy-by-author @conn "ho.*eld"))))))
+
+(deftest similar-authors
+  (testing "Find very similar author names"
+    (is (= 4 (count (sut/similar-authors @conn :fuzz-level 0.95))))))
+
+(deftest similar-titles
+  (testing "Find very similar titles"
+    (is (= 1 (count (sut/similar-titles @conn :fuzz-level 0.85))))))
