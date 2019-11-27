@@ -19,6 +19,8 @@
 (def ela-matches 1)
 ;36 matches for "^.*author.*ho.*feld" in buffer: literature.bib
 (def tobias-papers 36)
+(def author-matches 4)
+(def title-matches 1)
 
 (def conn (sut/make-conn))
 
@@ -52,3 +54,11 @@
 (deftest fuzzy-author
   (testing "Fuzzy author search"
     (is (= tobias-papers (count (sut/fuzzy-by-author @conn "ho.*eld"))))))
+
+(deftest similar-authors
+  (testing "Find very similar author names"
+    (is (= author-matches (count (sut/similar-authors @conn :fuzz-level 0.95))))))
+
+(deftest similar-titles
+  (testing "Find very similar titles"
+    (is (= title-matches (count (sut/similar-titles @conn :fuzz-level 0.85))))))
