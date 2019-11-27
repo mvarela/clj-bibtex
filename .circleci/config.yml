@@ -1,4 +1,7 @@
 version: 2.1
+orbs:
+  codecov: codecov/codecov@1.0.2
+
 jobs:
   build:
     docker:
@@ -19,6 +22,10 @@ jobs:
           - v2-dependencies-
         
       - run: ./bin/cibuild
+
+
+      - codecov/upload:
+          file: ./target/coverage/codecov.json
 
       - save_cache:
           paths:
