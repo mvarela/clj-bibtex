@@ -15,6 +15,7 @@
 
 [![img](https://circleci.com/gh/mvarela/clj-bibtex.svg?style=svg)](https://circleci.com/gh/mvarela/clj-bibtex)
 [![img](https://img.shields.io/clojars/v/fi.varela/clj-bibtex.svg)](https://clojars.org/fi.varela/clj-bibtex)
+[![codecov](https://codecov.io/gh/mvarela/clj-bibtex/branch/master/graph/badge.svg)](https://codecov.io/gh/mvarela/clj-bibtex)
 
 A simple wrapper around [jbibtex](https://github.com/jbibtex/jbibtex) for handling BibTeX bibliographies..
 

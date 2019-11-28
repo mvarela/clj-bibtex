@@ -1,6 +1,9 @@
 * clj-bibtex
 [[https://circleci.com/gh/mvarela/clj-bibtex][https://circleci.com/gh/mvarela/clj-bibtex.svg?style=svg]]
 [[https://clojars.org/fi.varela/clj-bibtex][https://img.shields.io/clojars/v/fi.varela/clj-bibtex.svg]]
+[[https://codecov.io/gh/mvarela/clj-bibtex][https://codecov.io/gh/mvarela/clj-bibtex/branch/master/graph/badge.svg]]
+
+
 
   A simple wrapper around [[https://github.com/jbibtex/jbibtex][jbibtex]] for handling BibTeX bibliographies..
 
