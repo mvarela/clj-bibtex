@@ -1,7 +1,8 @@
 (ns fi.varela.clj-bibtex.db
   (:require [datascript.core :as d]
             [fi.varela.clj-bibtex.string-distance :as str-d]
-            [clojure.string :as string]))
+            [clojure.string :as string]
+            [net.cgrand.xforms :as x]))
 
 (defn make-conn
   "Creates a connection to an empty db with a suitable schema for BibTeX entries"
@@ -96,11 +97,16 @@
   need to be to be included in the results."
   [db a-key &{:keys [fuzz-level] :or {fuzz-level 0.7}}]
   {:pre [(#{:authors :titles} a-key)]}
-  (let [entries (->> (if (= a-key :authors)
-                       (all-authors db)
-                       (all-titles db))
-                     sort)]
-    (filterv #(> (% 2) fuzz-level) (mapv (fn[[a b]] [a b (str-d/sorensen-dice a b)]) (partition 2 1 entries)))))
+  (let [entries (if (= a-key :authors)
+                  (all-authors db)
+                  (all-titles db))
+        xform (comp
+               (x/sort)
+               (x/partition 2 1)
+               (map (fn[[s1 s2]] [s1 s2 (str-d/sorensen-dice s1 s2)]))
+               (filter (fn[[_ _ sd]] (> sd fuzz-level))))]
+    (into [] xform entries)))
+
 
 (defn similar-authors
   "Returns a vector of triplets `[a1 a2 score]` for similar author names in `db`, considered pairwise.
