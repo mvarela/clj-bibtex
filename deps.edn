@@ -16,16 +16,16 @@
   :uberjar {:extra-deps
             {luchiniatwork/cambada {:mvn/version "1.0.2"}}
             :main-opts ["-m" "cambada.uberjar"
-                        "--app-version" "0.1.0"
+                        "--app-version" "0.1.1"
                         "--app-group-id" "fi.varela"
                         "--app-artifact-id" "clj-bibtex"]}
   :jar {:extra-deps
         {luchiniatwork/cambada {:mvn/version "1.0.2"}}
         :main-opts ["-m" "cambada.jar"
-                    "--app-version" "0.1.0"
+                    "--app-version" "0.1.1"
                     "--app-group-id" "fi.varela"
                     "--app-artifact-id" "clj-bibtex"]}
   :deploy {:extra-deps {deps-deploy {:mvn/version "RELEASE"}}
            :main-opts ["-m" "deps-deploy.deps-deploy" "deploy"
-		                   "target/clj-bibtex-0.1.0.jar"]}}}
+		                   "target/clj-bibtex-0.1.1.jar"]}}}
 
